@@ -27,8 +27,10 @@ import softmax_cross_entropy_loss
 import window_iterator
 
 import os
+import util 
 import cPickle
 import index_sequence_maker
+import make_dataset 
 
 def make_argparser():
     parser = argparse.ArgumentParser()
@@ -69,17 +71,6 @@ def convert(batch, device):
     return center, context
 
 
-def count_total_size(input_path, output_path):
-    if os.path.exists(output_path):
-        return cPickle.load(open(output_path))
-    else:
-        c = 0
-        for index in index_sequence_maker.index_generator(input_path):
-            c += 1
-        cPickle.dump(c, open(output_path, "wb"))
-        return c
-
-
 def find_train_max(input_path, max_count, output_path):
     if os.path.exists(output_path):
         return cPickle.load(open(output_path))
@@ -106,9 +97,21 @@ def make_counter(input_path, output_path):
         return ret
 
 
+def load_dataset(input_path, train_size, output_path_0, output_path_1):
+    if os.path.exists(output_path_0) and os.path.exists(output_path_1):
+        total = make_dataset.load_dataset(output_path_0, output_path_1)
+    else:
+        total = make_dataset.save_dataset(input_path, output_path_0, output_path_1)
+    train = total[:train_size]
+    val = total[train_size:]
+    return (train, val)
+
+
 COUNTS_PATH = "/home/ubuntu/data/word2vec/counts.pkl"
 TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/train_max.pkl"   
 TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/total_size.pkl"   
+TOTAL_DATASET_PATH_0 = "/home/ubuntu/data/word2vec/total_dataset_0.pkl"   
+TOTAL_DATASET_PATH_1 = "/home/ubuntu/data/word2vec/total_dataset_1.pkl"   
 
 
 if __name__ == "__main__":
@@ -136,35 +139,38 @@ if __name__ == "__main__":
     if args.gpu >= 0:
         cuda.get_device(args.gpu).use()
 
-    total_size = count_total_size(args.input, TOTAL_SIZE_PATH)
+    total_size = util.count_total_size(args.input, TOTAL_SIZE_PATH)
     train_size = int(total_size * 0.7)
     val_size = total_size - train_size
+    print("(total_size, train_size, val_size)=({a}, {b}, {c})".format(a=total_size, b=train_size, c=val_size))
+
+    train, val = load_dataset(args.input, train_size, TOTAL_DATASET_PATH_0, TOTAL_DATASET_PATH_1)
+    print("loading data done")
 #
 #    train, val, _ = chainer.datasets.get_ptb_words()
 #    counts = collections.Counter(train)
+
 #    counts.update(collections.Counter(val))
      
     counts = make_counter(args.input, COUNTS_PATH)
     train_max = find_train_max(args.input, train_size, TRAIN_MAX_PATH)
     n_vocab = train_max + 1
+
 #    n_vocab = max(train) + 1
 
-#    if args.test:
-#        train = train[:100]
-#        val = val[:100]
-#
+    if args.test:
+        train = train[:100]
+        val = val[:100]
+
 #    vocab = chainer.datasets.get_ptb_words_vocabulary()
+
     vocab = cPickle.load(open(args.word2index)) 
     index2word = cPickle.load(open(args.index2word))
-    index = vocab["東京"]
-    print(index2word[index])
-#
+
 #    print('n_vocab: %d' % n_vocab)
 #    print('data length: %d' % len(train))
 
-    print('n_vocab: %d' % n_vocab)
-    print('data length: %d' % train_size)
-    
+    print("(n_vocab, data length)=({a}, {b})".format(a=n_vocab, b=len(train)))
 
     if args.out_type == 'hsm':
         HSM = L.BinaryHierarchicalSoftmax
@@ -183,35 +189,34 @@ if __name__ == "__main__":
     if args.model == 'skipgram':
         model = skip_gram.SkipGram(n_vocab, args.unit, loss_func)
     elif args.model == 'cbow':
-        n_vocab = 900000
         model = continuous_bow.ContinuousBoW(n_vocab, args.unit, loss_func)
     else:
         raise Exception('Unknown model type: {}'.format(args.model))
 
     if args.gpu >= 0:
         model.to_gpu()
-#
-#
-#    optimizer = O.Adam()
-#    optimizer.setup(model)
-#
-#    train_iter = window_iterator.WindowIterator(train, args.window, args.batchsize)
-#    val_iter = window_iterator.WindowIterator(val, args.window, args.batchsize, repeat=False)
-#    updater = training.StandardUpdater(
-#        train_iter, optimizer, converter=convert, device=args.gpu)
-#    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
-#
-#    trainer.extend(extensions.Evaluator(
-#        val_iter, model, converter=convert, device=args.gpu))
-#    trainer.extend(extensions.LogReport())
-#    trainer.extend(extensions.PrintReport(
-#        ['epoch', 'main/loss', 'validation/main/loss']))
-#    trainer.extend(extensions.ProgressBar())
-#    trainer.run()
-#
-#    with open('word2vec.model', 'w') as f:
-#        f.write('%d %d\n' % (len(index2word), args.unit))
-#        w = cuda.to_cpu(model.embed.W.data)
-#        for i, wi in enumerate(w):
-#            v = ' '.join(map(str, wi))
-#            f.write('%s %s\n' % (index2word[i], v))
+
+
+    optimizer = O.Adam()
+    optimizer.setup(model)
+
+    train_iter = window_iterator.WindowIterator(train, args.window, args.batchsize)
+    val_iter = window_iterator.WindowIterator(val, args.window, args.batchsize, repeat=False)
+    updater = training.StandardUpdater(
+        train_iter, optimizer, converter=convert, device=args.gpu)
+    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
+
+    trainer.extend(extensions.Evaluator(
+        val_iter, model, converter=convert, device=args.gpu))
+    trainer.extend(extensions.LogReport())
+    trainer.extend(extensions.PrintReport(
+        ['epoch', 'main/loss', 'validation/main/loss']))
+    trainer.extend(extensions.ProgressBar())
+    trainer.run()
+
+    with open('word2vec.model', 'w') as f:
+        f.write('%d %d\n' % (len(index2word), args.unit))
+        w = cuda.to_cpu(model.embed.W.data)
+        for i, wi in enumerate(w):
+            v = ' '.join(map(str, wi))
+            f.write('%s %s\n' % (index2word[i], v))

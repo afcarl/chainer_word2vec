@@ -1,6 +1,6 @@
 #!/bin/sh
 
-./train_word2vec.py \
+time ./train_word2vec.py \
     --gpu -1 \
     --input /home/ubuntu/data/word2vec/jawiki-wakati-index-sequence.txt \
     --index2word /home/ubuntu/data/word2vec/index2word.pkl \
@@ -8,5 +8,6 @@
     --unit 200 \
     --out-type ns \
     --model cbow \
+    --window 8 \
     --epoch 1
 
