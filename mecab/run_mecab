@@ -1,0 +1,14 @@
+#!/bin/sh
+
+mecab \
+    -d /usr/lib/mecab/dic/mecab-ipadic-neologd \
+    -F"%f[6] " \
+    -U"%m " \
+    -E"\n" /home/ubuntu/data/word2vec/jawiki.txt \
+    -b 20000 > /home/ubuntu/data/word2vec/jawiki-wakati.txt 
+
+#mecab \
+#    -d /usr/lib/mecab/dic/mecab-ipadic-neologd \
+#    -F"%f[6] " \
+#    -U"%m " \
+#    -E"\n" /home/ubuntu/data/word2vec/test.txt > hoge
