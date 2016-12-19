@@ -144,7 +144,7 @@ if __name__ == "__main__":
     val_size = total_size - train_size
     print("(total_size, train_size, val_size)=({a}, {b}, {c})".format(a=total_size, b=train_size, c=val_size))
 
-    train, val = load_dataset(args.input, train_size, TOTAL_DATASET_PATH_0, TOTAL_DATASET_PATH_1)
+#    train, val = load_dataset(args.input, train_size, TOTAL_DATASET_PATH_0, TOTAL_DATASET_PATH_1)
     print("loading data done")
 #
 #    train, val, _ = chainer.datasets.get_ptb_words()
@@ -152,15 +152,16 @@ if __name__ == "__main__":
 
 #    counts.update(collections.Counter(val))
      
+    print("0")
     counts = make_counter(args.input, COUNTS_PATH)
     train_max = find_train_max(args.input, train_size, TRAIN_MAX_PATH)
     n_vocab = train_max + 1
 
 #    n_vocab = max(train) + 1
 
-    if args.test:
-        train = train[:100]
-        val = val[:100]
+#    if args.test:
+#        train = train[:100]
+#        val = val[:100]
 
 #    vocab = chainer.datasets.get_ptb_words_vocabulary()
 
@@ -170,8 +171,9 @@ if __name__ == "__main__":
 #    print('n_vocab: %d' % n_vocab)
 #    print('data length: %d' % len(train))
 
-    print("(n_vocab, data length)=({a}, {b})".format(a=n_vocab, b=len(train)))
+#    print("(n_vocab, data length)=({a}, {b})".format(a=n_vocab, b=len(train)))
 
+    print("1")
     if args.out_type == 'hsm':
         HSM = L.BinaryHierarchicalSoftmax
         tree = HSM.create_huffman_tree(counts)
@@ -186,6 +188,7 @@ if __name__ == "__main__":
     else:
         raise Exception('Unknown output type: {}'.format(args.out_type))
 
+    print("2")
     if args.model == 'skipgram':
         model = skip_gram.SkipGram(n_vocab, args.unit, loss_func)
     elif args.model == 'cbow':
@@ -193,30 +196,32 @@ if __name__ == "__main__":
     else:
         raise Exception('Unknown model type: {}'.format(args.model))
 
+    print("3")
     if args.gpu >= 0:
+        # When selecting GPU, the error of "out of memory" occurs.
         model.to_gpu()
 
-
+    print("4")
     optimizer = O.Adam()
     optimizer.setup(model)
 
-    train_iter = window_iterator.WindowIterator(train, args.window, args.batchsize)
-    val_iter = window_iterator.WindowIterator(val, args.window, args.batchsize, repeat=False)
-    updater = training.StandardUpdater(
-        train_iter, optimizer, converter=convert, device=args.gpu)
-    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
-
-    trainer.extend(extensions.Evaluator(
-        val_iter, model, converter=convert, device=args.gpu))
-    trainer.extend(extensions.LogReport())
-    trainer.extend(extensions.PrintReport(
-        ['epoch', 'main/loss', 'validation/main/loss']))
-    trainer.extend(extensions.ProgressBar())
-    trainer.run()
-
-    with open('word2vec.model', 'w') as f:
-        f.write('%d %d\n' % (len(index2word), args.unit))
-        w = cuda.to_cpu(model.embed.W.data)
-        for i, wi in enumerate(w):
-            v = ' '.join(map(str, wi))
-            f.write('%s %s\n' % (index2word[i], v))
+#    train_iter = window_iterator.WindowIterator(train, args.window, args.batchsize)
+#    val_iter = window_iterator.WindowIterator(val, args.window, args.batchsize, repeat=False)
+#    updater = training.StandardUpdater(
+#        train_iter, optimizer, converter=convert, device=args.gpu)
+#    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
+#
+#    trainer.extend(extensions.Evaluator(
+#        val_iter, model, converter=convert, device=args.gpu))
+#    trainer.extend(extensions.LogReport())
+#    trainer.extend(extensions.PrintReport(
+#        ['epoch', 'main/loss', 'validation/main/loss']))
+#    trainer.extend(extensions.ProgressBar())
+#    trainer.run()
+#
+#    with open('word2vec.model', 'w') as f:
+#        f.write('%d %d\n' % (len(index2word), args.unit))
+#        w = cuda.to_cpu(model.embed.W.data)
+#        for i, wi in enumerate(w):
+#            v = ' '.join(map(str, wi))
+#            f.write('%s %s\n' % (index2word[i], v))
