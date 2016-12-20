@@ -26,9 +26,9 @@ def register_words(uwords, words):
         uwords.add(word)
 
 
-FILE_PATH = "/home/ubuntu/data/word2vec/jawiki-wakati.txt"
-WORD2INDEX_PATH = "/home/ubuntu/data/word2vec/word2index.pkl"
-INDEX2WORD_PATH = "/home/ubuntu/data/word2vec/index2word.pkl"
+FILE_PATH = "/home/ubuntu/data/word2vec/small/jawiki-wakati.txt"
+WORD2INDEX_PATH = "/home/ubuntu/data/word2vec/small/word2index.pkl"
+INDEX2WORD_PATH = "/home/ubuntu/data/word2vec/small/index2word.pkl"
 
 if __name__ == "__main__":
 

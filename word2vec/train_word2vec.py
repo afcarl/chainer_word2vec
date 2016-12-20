@@ -192,6 +192,7 @@ if __name__ == "__main__":
     if args.model == 'skipgram':
         model = skip_gram.SkipGram(n_vocab, args.unit, loss_func)
     elif args.model == 'cbow':
+        n_vocab = 900000
         model = continuous_bow.ContinuousBoW(n_vocab, args.unit, loss_func)
     else:
         raise Exception('Unknown model type: {}'.format(args.model))
