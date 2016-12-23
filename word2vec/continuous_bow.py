@@ -4,6 +4,7 @@
 import chainer
 import chainer.functions as F
 import chainer.initializers as I
+from chainer import reporter
 
 class ContinuousBoW(chainer.Chain):
 

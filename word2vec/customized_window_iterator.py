@@ -35,7 +35,7 @@ class WindowIterator(chainer.dataset.Iterator):
         self.current_position = 0
 
     def make_sequence_head(self, generator, size):
-        return np.array([next(generator) for _ in range(size)])
+        return np.array([next(generator) for _ in range(size)]).astype(np.int32)
 
     def index_sequence_generator(self, path):
         return index_sequence_maker.index_generator(self.index_sequence_file_path)
@@ -71,6 +71,7 @@ class WindowIterator(chainer.dataset.Iterator):
             self.sequence_head = sequence[self.batch_size:self.batch_size + self.double_window]
             self.batch_index += 1
 
+        print("epoch: {}".format(self.epoch_detail))
         return center, context
 
     @property

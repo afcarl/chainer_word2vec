@@ -1,3 +1,4 @@
 */*.pyc
 */*.pkl
 word2vec/result/*
+word2vec/':w

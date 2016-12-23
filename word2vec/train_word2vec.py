@@ -111,8 +111,10 @@ COUNTS_PATH = "/home/ubuntu/data/word2vec/small/counts.pkl"
 TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/small/train_max.pkl"   
 TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/small/total_size.pkl"   
 COUNTS_PATH = "/home/ubuntu/data/word2vec/small/counts.pkl"   
-#TOTAL_DATASET_PATH_0 = "/home/ubuntu/data/word2vec/total_dataset_0.pkl"   
-#TOTAL_DATASET_PATH_1 = "/home/ubuntu/data/word2vec/total_dataset_1.pkl"   
+
+
+def make_dummy_counts(size):
+    return collections.Counter({i: i for i in range(size)})
 
 
 if __name__ == "__main__":
@@ -143,26 +145,18 @@ if __name__ == "__main__":
     total_size = util.count_total_size(args.input, TOTAL_SIZE_PATH)
     print("total_size: {}".format(total_size))
 
-#    train, val, _ = chainer.datasets.get_ptb_words()
-#    counts = collections.Counter(train)
-
-#    counts.update(collections.Counter(val))
-     
     print("...load counts")
     counts = util.make_counter(args.input, COUNTS_PATH)
     train_max = util.find_train_max(args.input, TRAIN_MAX_PATH)
     n_vocab = train_max + 1
-
-#    if args.test:
-#        train = train[:100]
-#        val = val[:100]
 
     print("...load vocab and index2word")
     vocab = cPickle.load(open(args.word2index)) 
     index2word = cPickle.load(open(args.index2word))
 
     print("n_vocab: {}".format(n_vocab))
-
+    print("counts: {}".format(len(counts)))
+    
     if args.out_type == 'hsm':
         HSM = L.BinaryHierarchicalSoftmax
         tree = HSM.create_huffman_tree(counts)
@@ -183,33 +177,37 @@ if __name__ == "__main__":
         model = continuous_bow.ContinuousBoW(n_vocab, args.unit, loss_func)
     else:
         raise Exception('Unknown model type: {}'.format(args.model))
-#
-#    print("3")
-#    if args.gpu >= 0:
-#        # When selecting GPU, the error of "out of memory" occurs.
-#        model.to_gpu()
-#
-#    print("4")
-#    optimizer = O.Adam()
-#    optimizer.setup(model)
 
-#    train_iter = window_iterator.WindowIterator(train, args.window, args.batchsize)
-#    val_iter = window_iterator.WindowIterator(val, args.window, args.batchsize, repeat=False)
-#    updater = training.StandardUpdater(
-#        train_iter, optimizer, converter=convert, device=args.gpu)
-#    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
-#
-#    trainer.extend(extensions.Evaluator(
-#        val_iter, model, converter=convert, device=args.gpu))
-#    trainer.extend(extensions.LogReport())
-#    trainer.extend(extensions.PrintReport(
-#        ['epoch', 'main/loss', 'validation/main/loss']))
-#    trainer.extend(extensions.ProgressBar())
-#    trainer.run()
-#
-#    with open('word2vec.model', 'w') as f:
-#        f.write('%d %d\n' % (len(index2word), args.unit))
-#        w = cuda.to_cpu(model.embed.W.data)
-#        for i, wi in enumerate(w):
-#            v = ' '.join(map(str, wi))
-#            f.write('%s %s\n' % (index2word[i], v))
+    if args.gpu >= 0:
+        # When selecting GPU, the error of "out of memory" occurs.
+        model.to_gpu()
+
+    optimizer = O.Adam()
+    optimizer.setup(model)
+
+    train_iter = customized_window_iterator.WindowIterator(
+            args.window, 
+            args.batchsize,
+            index_sequence_file_path=args.input,
+            total_size_path=TOTAL_SIZE_PATH,
+            repeat=True)
+            
+    updater = training.StandardUpdater(
+        train_iter, 
+        optimizer, 
+        converter=convert, 
+        device=args.gpu)
+    trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
+
+    trainer.extend(extensions.LogReport())
+    trainer.extend(extensions.PrintReport(
+        ['epoch', 'main/loss']))
+    trainer.extend(extensions.ProgressBar())
+    trainer.run()
+
+    with open('word2vec.model', 'w') as f:
+        f.write('%d %d\n' % (len(index2word), args.unit))
+        w = cuda.to_cpu(model.embed.W.data)
+        for i, wi in enumerate(w):
+            v = ' '.join(map(str, wi))
+            f.write('%s %s\n' % (index2word[i], v))

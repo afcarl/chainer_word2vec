@@ -1,13 +1,15 @@
 #!/bin/sh
 
 ./train_word2vec.py \
-    --gpu 0 \
+    --gpu -1 \
     --input /home/ubuntu/data/word2vec/small/jawiki-wakati-index-sequence.txt \
     --index2word /home/ubuntu/data/word2vec/small/index2word.pkl \
     --word2index /home/ubuntu/data/word2vec/small/word2index.pkl \
     --unit 200 \
+    --batchsize 1000000 \
     --out-type ns \
     --model cbow \
     --window 8 \
+    --out /home/ubuntu/data/word2vec/small/result \
     --epoch 1
 
