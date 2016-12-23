@@ -3,39 +3,48 @@
 
 import numpy as np
 import chainer
-
+import index_sequence_maker
+import os
+import cPickle
+import util
 
 class WindowIterator(chainer.dataset.Iterator):
-
-    def count_total_size(self, generator):
-        return sum([1 for _ in generator])
-
-    def __init__(self, window, batch_size, repeat=True):
-        self.generator = self.index_sequence_generator()
+    
+    def __init__(
+            self, 
+            window, 
+            batch_size, 
+            index_sequence_file_path="", 
+            total_size_path="",
+            repeat=True):
+        self.index_sequence_file_path = index_sequence_file_path
+        self.generator = self.index_sequence_generator(self.index_sequence_file_path)
         self.window = window
         self.batch_size = batch_size
         self._repeat = repeat
         self.epoch = 0
-        self.total_size = self.count_total_size(self.index_sequence_generator())
+        self.total_size = util.count_total_size(
+                self.index_sequence_generator(self.index_sequence_file_path),
+                total_size_path)
         self.double_window = 2 * self.window
         self.batch_index = 0
         self.sequence_head = self.make_sequence_head(self.generator, self.double_window)
         self.is_end_of_epoch = False
-        w = self.window # np.random.randint(self.window - 1) + 1 # 2
+        w = self.window  # np.random.randint(self.window - 1) + 1 # 2
         self.offset = np.concatenate([np.arange(-w, 0), np.arange(1, w + 1)])
         self.current_position = 0
 
     def make_sequence_head(self, generator, size):
         return np.array([next(generator) for _ in range(size)])
-    
-    def index_sequence_generator(self):
-        for i in range(100):
-            yield i
 
+    def index_sequence_generator(self, path):
+        return index_sequence_maker.index_generator(self.index_sequence_file_path)
+
+    # test ok
     def __next__(self):
         if not self._repeat and self.epoch > 0:
             raise StopIteration
-        
+
         remained_size = self.total_size - (self.batch_size * self.batch_index + self.double_window)
         allocated_size = min(remained_size, self.batch_size)
         self.current_position = allocated_size + self.batch_size * self.batch_index + self.double_window
@@ -54,8 +63,8 @@ class WindowIterator(chainer.dataset.Iterator):
 
         if self.is_end_of_epoch:
             self.epoch += 1
-            self.generator = self.index_sequence_generator()
-            self.sequence_head = self.make_sequence_head(self.generator, self.double_window) 
+            self.generator = self.index_sequence_generator(self.index_sequence_file_path)
+            self.sequence_head = self.make_sequence_head(self.generator, self.double_window)
             self.batch_index = 0
             self.is_end_of_epoch = False
         else:
@@ -71,3 +80,29 @@ class WindowIterator(chainer.dataset.Iterator):
 
     def serialize(self, serializer):
         pass
+
+if __name__ == "__main__":
+    import progressbar
+    import time
+
+    window = 8 
+    batch_size = 10000 
+    sequence_path = "/home/ubuntu/data/word2vec/small/jawiki-wakati-index-sequence.txt"
+    total_size_path = "/home/ubuntu/data/word2vec/small/total_size.pkl"
+
+    witerator = WindowIterator(
+        window, 
+        batch_size, 
+        index_sequence_file_path=sequence_path, 
+        total_size_path=total_size_path,
+        repeat=True)
+    
+    print("witerator.total_size:{}".format(witerator.total_size) )
+    upper_count = 1 
+    count_scale = 100
+    progressbar = progressbar.ProgressBar(maxvalue=int(count_scale * upper_count))
+    indices = [index for index in range(-window, window+1) if index != 0]
+    for center, context in witerator:
+        progressbar.update(int(count_scale * witerator.epoch_detail))
+        if upper_count == witerator.epoch_detail:
+            break

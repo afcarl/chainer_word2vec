@@ -4,16 +4,27 @@
 import unittest
 import customized_window_iterator
 import numpy as np
+import util
+
+class WindowIteratorForUnitTest(customized_window_iterator.WindowIterator):
+    def index_sequence_generator(self, path=""):
+        for i in range(100):
+            yield i
+
+    def __init__(self, window, batch_size, repeat=True):
+        super(WindowIteratorForUnitTest, self).__init__(window, batch_size, repeat)
+
 
 class TestWindowIterator(unittest.TestCase):
 
     def test_init(self):
         window = 2 
         batch_size = 5 
-        witerator = customized_window_iterator.WindowIterator(window, batch_size)
+        witerator = WindowIteratorForUnitTest(window, batch_size)
+        
         self.assertTrue(witerator.window == window)
         self.assertTrue(witerator.batch_size, batch_size)
-        self.assertTrue(witerator.total_size == witerator.count_total_size(witerator.index_sequence_generator()))
+        self.assertTrue(witerator.total_size == util.count_total_size(witerator.index_sequence_generator(), ""))
         self.assertTrue(witerator.batch_index == 0)
         upper_count = 2 
         try:

@@ -2,9 +2,9 @@
 
 ./train_word2vec.py \
     --gpu 0 \
-    --input /home/ubuntu/data/word2vec/jawiki-wakati-index-sequence.txt \
-    --index2word /home/ubuntu/data/word2vec/index2word.pkl \
-    --word2index /home/ubuntu/data/word2vec/word2index.pkl \
+    --input /home/ubuntu/data/word2vec/small/jawiki-wakati-index-sequence.txt \
+    --index2word /home/ubuntu/data/word2vec/small/index2word.pkl \
+    --word2index /home/ubuntu/data/word2vec/small/word2index.pkl \
     --unit 200 \
     --out-type ns \
     --model cbow \

@@ -24,7 +24,7 @@ from chainer.training import extensions
 import continuous_bow
 import skip_gram
 import softmax_cross_entropy_loss
-import window_iterator
+import customized_window_iterator
 
 import os
 import util 
@@ -107,11 +107,12 @@ def load_dataset(input_path, train_size, output_path_0, output_path_1):
     return (train, val)
 
 
-COUNTS_PATH = "/home/ubuntu/data/word2vec/counts.pkl"
-TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/train_max.pkl"   
-TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/total_size.pkl"   
-TOTAL_DATASET_PATH_0 = "/home/ubuntu/data/word2vec/total_dataset_0.pkl"   
-TOTAL_DATASET_PATH_1 = "/home/ubuntu/data/word2vec/total_dataset_1.pkl"   
+COUNTS_PATH = "/home/ubuntu/data/word2vec/small/counts.pkl"
+TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/small/train_max.pkl"   
+TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/small/total_size.pkl"   
+COUNTS_PATH = "/home/ubuntu/data/word2vec/small/counts.pkl"   
+#TOTAL_DATASET_PATH_0 = "/home/ubuntu/data/word2vec/total_dataset_0.pkl"   
+#TOTAL_DATASET_PATH_1 = "/home/ubuntu/data/word2vec/total_dataset_1.pkl"   
 
 
 if __name__ == "__main__":
@@ -124,10 +125,10 @@ if __name__ == "__main__":
         cuda.check_cuda_available()
 
     print('GPU: {}'.format(args.gpu))
-    print('# unit: {}'.format(args.unit))
+    print('unit: {}'.format(args.unit))
     print('Window: {}'.format(args.window))
     print('Minibatch-size: {}'.format(args.batchsize))
-    print('# epoch: {}'.format(args.epoch))
+    print('epoch: {}'.format(args.epoch))
     print('Training model: {}'.format(args.model))
     print('Output type: {}'.format(args.out_type))
     print('input: {}'.format(args.input))
@@ -140,40 +141,28 @@ if __name__ == "__main__":
         cuda.get_device(args.gpu).use()
 
     total_size = util.count_total_size(args.input, TOTAL_SIZE_PATH)
-    train_size = int(total_size * 0.7)
-    val_size = total_size - train_size
-    print("(total_size, train_size, val_size)=({a}, {b}, {c})".format(a=total_size, b=train_size, c=val_size))
+    print("total_size: {}".format(total_size))
 
-#    train, val = load_dataset(args.input, train_size, TOTAL_DATASET_PATH_0, TOTAL_DATASET_PATH_1)
-    print("loading data done")
-#
 #    train, val, _ = chainer.datasets.get_ptb_words()
 #    counts = collections.Counter(train)
 
 #    counts.update(collections.Counter(val))
      
-    print("0")
-    counts = make_counter(args.input, COUNTS_PATH)
-    train_max = find_train_max(args.input, train_size, TRAIN_MAX_PATH)
+    print("...load counts")
+    counts = util.make_counter(args.input, COUNTS_PATH)
+    train_max = util.find_train_max(args.input, TRAIN_MAX_PATH)
     n_vocab = train_max + 1
-
-#    n_vocab = max(train) + 1
 
 #    if args.test:
 #        train = train[:100]
 #        val = val[:100]
 
-#    vocab = chainer.datasets.get_ptb_words_vocabulary()
-
+    print("...load vocab and index2word")
     vocab = cPickle.load(open(args.word2index)) 
     index2word = cPickle.load(open(args.index2word))
 
-#    print('n_vocab: %d' % n_vocab)
-#    print('data length: %d' % len(train))
+    print("n_vocab: {}".format(n_vocab))
 
-#    print("(n_vocab, data length)=({a}, {b})".format(a=n_vocab, b=len(train)))
-
-    print("1")
     if args.out_type == 'hsm':
         HSM = L.BinaryHierarchicalSoftmax
         tree = HSM.create_huffman_tree(counts)
@@ -188,23 +177,21 @@ if __name__ == "__main__":
     else:
         raise Exception('Unknown output type: {}'.format(args.out_type))
 
-    print("2")
     if args.model == 'skipgram':
         model = skip_gram.SkipGram(n_vocab, args.unit, loss_func)
     elif args.model == 'cbow':
-        n_vocab = 900000
         model = continuous_bow.ContinuousBoW(n_vocab, args.unit, loss_func)
     else:
         raise Exception('Unknown model type: {}'.format(args.model))
-
-    print("3")
-    if args.gpu >= 0:
-        # When selecting GPU, the error of "out of memory" occurs.
-        model.to_gpu()
-
-    print("4")
-    optimizer = O.Adam()
-    optimizer.setup(model)
+#
+#    print("3")
+#    if args.gpu >= 0:
+#        # When selecting GPU, the error of "out of memory" occurs.
+#        model.to_gpu()
+#
+#    print("4")
+#    optimizer = O.Adam()
+#    optimizer.setup(model)
 
 #    train_iter = window_iterator.WindowIterator(train, args.window, args.batchsize)
 #    val_iter = window_iterator.WindowIterator(val, args.window, args.batchsize, repeat=False)
