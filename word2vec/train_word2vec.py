@@ -71,32 +71,6 @@ def convert(batch, device):
     return center, context
 
 
-def find_train_max(input_path, max_count, output_path):
-    if os.path.exists(output_path):
-        return cPickle.load(open(output_path))
-    else:
-        max_index = -1
-        for i, index in enumerate(index_sequence_maker.index_generator(input_path), start=1):
-            if index > max_index:
-                max_index = index
-            if i == max_count:
-                break
-        cPickle.dump(max_index, open(output_path, "wb"))
-        return max_index 
-
-
-def make_counter(input_path, output_path):
-    if os.path.exists(output_path):
-        return cPickle.load(open(output_path))
-    else:
-        dic = collections.defaultdict(int) 
-        for index in index_sequence_maker.index_generator(input_path):
-             dic[index] += 1 
-        ret = collections.Counter(dic) 
-        cPickle.dump(ret, open(output_path, "wb"))
-        return ret
-
-
 def load_dataset(input_path, train_size, output_path_0, output_path_1):
     if os.path.exists(output_path_0) and os.path.exists(output_path_1):
         total = make_dataset.load_dataset(output_path_0, output_path_1)
@@ -133,11 +107,11 @@ if __name__ == "__main__":
     print('epoch: {}'.format(args.epoch))
     print('Training model: {}'.format(args.model))
     print('Output type: {}'.format(args.out_type))
+    print('negative size: {}'.format(args.negative_size))
     print('input: {}'.format(args.input))
     print('index2word: {}'.format(args.index2word))
     print('word2index: {}'.format(args.word2index))
     print('')
-
 
     if args.gpu >= 0:
         cuda.get_device(args.gpu).use()
@@ -153,10 +127,9 @@ if __name__ == "__main__":
     print("...load vocab and index2word")
     vocab = cPickle.load(open(args.word2index)) 
     index2word = cPickle.load(open(args.index2word))
-
     print("n_vocab: {}".format(n_vocab))
     print("counts: {}".format(len(counts)))
-    
+
     if args.out_type == 'hsm':
         HSM = L.BinaryHierarchicalSoftmax
         tree = HSM.create_huffman_tree(counts)

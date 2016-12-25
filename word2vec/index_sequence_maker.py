@@ -3,19 +3,24 @@
 
 import cPickle
 import sys
+import load_data
 
 WORD2INDEX_FILE_PATH = "/home/ubuntu/data/word2vec/small/word2index.pkl" # input
 JAWIKI_WAKATI_FILE_PATH = "/home/ubuntu/data/word2vec/small/jawiki-wakati.txt" # input
 INDEX_SEQUENCE_FILE_PATH = "/home/ubuntu/data/word2vec/small/jawiki-wakati-index-sequence.txt" # output
 
+# test ok
+def get_index(word2index, token):
+    return word2index[token] if word2index.has_key(token) else word2index[load_data.UNKNOWN_WORD]
 
+
+# test ok
 def save(jawiki_wakati_file_path, word2index_file_path, index_sequence_file_path):   
     fout = open(index_sequence_file_path, "w")
-    c = 0
     word2index = cPickle.load(open(word2index_file_path))
     for line in open(jawiki_wakati_file_path):
         tokens = line.strip().split()
-        indices = [str(word2index[token]) for token in tokens]
+        indices = [str(get_index(word2index, token)) for token in tokens]
         seq = " ".join(indices)
         fout.write("{}\n".format(seq)) 
 

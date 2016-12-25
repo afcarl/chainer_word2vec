@@ -6,13 +6,14 @@ import cPickle
 import index_sequence_maker
 import collections
 
-def count_total_size(generator, path):
-    if os.path.exists(path):
-        return cPickle.load(open(path))
+def count_total_size(input_path, out_path):
+    if os.path.exists(out_path):
+        return cPickle.load(open(out_path))
     else:
+        generator = index_sequence_maker.index_generator(input_path)
         total_size = sum([1 for _ in generator])
-        if path != "":
-            cPickle.dump(total_size, open(path, "wb"))
+        if out_path != "":
+            cPickle.dump(total_size, open(out_path, "wb"))
         return total_size 
 
 
