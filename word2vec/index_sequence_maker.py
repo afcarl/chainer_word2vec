@@ -5,9 +5,9 @@ import cPickle
 import sys
 import load_data
 
-WORD2INDEX_FILE_PATH = "/home/ubuntu/data/word2vec/small/word2index.pkl" # input
-JAWIKI_WAKATI_FILE_PATH = "/home/ubuntu/data/word2vec/small/jawiki-wakati.txt" # input
-INDEX_SEQUENCE_FILE_PATH = "/home/ubuntu/data/word2vec/small/jawiki-wakati-index-sequence.txt" # output
+WORD2INDEX_FILE_PATH = "/home/ubuntu/data/word2vec/original/word2index.pkl" # input
+JAWIKI_WAKATI_FILE_PATH = "/home/ubuntu/data/word2vec/original/jawiki-wakati.txt" # input
+INDEX_SEQUENCE_FILE_PATH = "/home/ubuntu/data/word2vec/original/jawiki-wakati-index-sequence.txt" # output
 
 # test ok
 def get_index(word2index, token):

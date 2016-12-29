@@ -71,7 +71,7 @@ class WindowIterator(chainer.dataset.Iterator):
             self.sequence_head = sequence[self.batch_size:self.batch_size + self.double_window]
             self.batch_index += 1
 
-        print("epoch: {}".format(self.epoch_detail))
+        # print("epoch: {}".format(self.epoch_detail))
         return center, context
 
     @property

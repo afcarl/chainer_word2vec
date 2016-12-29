@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     if args.gpu >= 0:
         cuda.get_device(args.gpu).use()
-
+    
     total_size = util.count_total_size(args.input, TOTAL_SIZE_PATH)
     print("total_size: {}".format(total_size))
 

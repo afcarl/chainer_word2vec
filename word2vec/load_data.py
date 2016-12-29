@@ -42,9 +42,9 @@ def make_maps(histogram):
     return word2index, index2word
 
 
-FILE_PATH = "/home/ubuntu/data/word2vec/small/jawiki-wakati.txt"
-WORD2INDEX_PATH = "/home/ubuntu/data/word2vec/small/word2index.pkl"
-INDEX2WORD_PATH = "/home/ubuntu/data/word2vec/small/index2word.pkl"
+FILE_PATH = "/home/ubuntu/data/word2vec/original/jawiki-wakati.txt"
+WORD2INDEX_PATH = "/home/ubuntu/data/word2vec/original/word2index.pkl"
+INDEX2WORD_PATH = "/home/ubuntu/data/word2vec/original/index2word.pkl"
 
 
 def save(file_path, word2index_path, index2word_path):
