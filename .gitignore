@@ -4,3 +4,4 @@ word2vec/result/*
 word2vec/':w
 word2vec/log
 word2vec/word2vec.model
+word2vec/out

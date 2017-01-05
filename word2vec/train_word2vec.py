@@ -81,10 +81,10 @@ def load_dataset(input_path, train_size, output_path_0, output_path_1):
     return (train, val)
 
 
-COUNTS_PATH = "/home/ubuntu/data/word2vec/small/counts.pkl"
-TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/small/train_max.pkl"   
-TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/small/total_size.pkl"   
-COUNTS_PATH = "/home/ubuntu/data/word2vec/small/counts.pkl"   
+COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"
+TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/train_max.pkl"   
+TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/total_size.pkl"   
+COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"   
 
 
 def make_dummy_counts(size):
