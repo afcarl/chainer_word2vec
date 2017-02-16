@@ -1,0 +1,10 @@
+#!/bin/sh
+
+./load_data.py \
+        --file_path /Users/kumada/Data/enwiki/20160920.wiki \
+        --min_count 0 \
+        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index.pkl \
+        --index2word_path /Users/kumada/Data/enwiki/20160920_index2word.pkl \
+        --histogram_path /Users/kumada/Data/enwiki/20160920_histogram.pkl \
+        --check_mode True
+

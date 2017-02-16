@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./find_words.py \
+        --file_path /Users/kumada/Data/image_net/test_list \
+        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index.pkl

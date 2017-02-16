@@ -3,11 +3,16 @@
 
 import cPickle
 import collections
+import argparse
+import util
 
 
-def create_histogram(filename):
+UNKNOWN_WORD = "<unk>"
+
+
+def create_histogram(file_path):
     histogram = collections.defaultdict(int)
-    with open(FILE_PATH) as fin:
+    with open(file_path) as fin:
         for line in fin:
             words = line.strip().split()
             register_words(histogram, words)
@@ -18,11 +23,6 @@ def register_words(histogram, words):
     for word in words:
         histogram[word] += 1
 
-
-UNKNOWN_WORD = "<unk>"
-#MIN_COUNT = 9  # small: We have to make the number of words be less than 661000 to avoid the cuda memory error.
-#MIN_COUNT = 23  # original: We have to make the number of words be less than 661000 to avoid the cuda memory error.
-MIN_COUNT = 5
 
 # If frequency of a word is less than "min_count,"  the word is removed.
 def reduce_words(histogram, min_count):
@@ -42,20 +42,22 @@ def make_maps(histogram):
     return word2index, index2word
 
 
-FILE_PATH = "/home/ubuntu/data/word2vec/original/jawiki-wakati.txt"
-WORD2INDEX_PATH = "/home/ubuntu/data/word2vec/original/word2index.pkl"
-INDEX2WORD_PATH = "/home/ubuntu/data/word2vec/original/index2word.pkl"
+def save(file_path, word2index_path, index2word_path, histogram_path, min_count):
+    histogram = create_histogram(file_path)
+    cPickle.dump(histogram, open(histogram_path, "wb"))
+    print("> save histogram")
 
-
-def save(file_path, word2index_path, index2word_path):
-    histogram = create_histogram(FILE_PATH)
     print("The total number of words is {}.".format(len(histogram)))
-    reduce_words(histogram, min_count=MIN_COUNT)
+    reduce_words(histogram, min_count=min_count)
     assert 1 == histogram[UNKNOWN_WORD], ""
     print("The number of words is {} after the reduction.".format(len(histogram)))
     (word2index, index2word) = make_maps(histogram)
-    cPickle.dump(word2index, open(WORD2INDEX_PATH, "wb"))
-    cPickle.dump(index2word, open(INDEX2WORD_PATH, "wb"))
+
+    cPickle.dump(word2index, open(word2index_path, "wb"))
+    print("> save word2index")
+
+    cPickle.dump(index2word, open(index2word_path, "wb"))
+    print("> save index2word")
 
 
 def check(word2index_path, index2word_path):
@@ -68,5 +70,37 @@ def check(word2index_path, index2word_path):
 
 
 if __name__ == "__main__":
-    save(FILE_PATH, WORD2INDEX_PATH, INDEX2WORD_PATH)
-    # check(WORD2INDEX_PATH, INDEX2WORD_PATH)
+    try:
+        # set command-line arguments
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--file_path", help="input: set a path to a space-separted text file")
+        parser.add_argument("--min_count", help="input: ignore a word whose frequency is less than it")
+        parser.add_argument("--histogram_path", help="output: set a path a histogram(.pkl)")
+        parser.add_argument("--word2index_path", help="output: set a path a word2index file(.pkl)")
+        parser.add_argument("--index2word_path", help="output: set a path an index2word file(.pkl)")
+        parser.add_argument("--check_mode", default=False, help="output: set a path an index2word file(.pkl)")
+
+        # parse arguments
+        args = parser.parse_args()
+        file_path = args.file_path
+        word2index_path = args.word2index_path
+        index2word_path = args.index2word_path
+        histogram_path = args.histogram_path
+        min_count = int(args.min_count)
+        check_mode = args.check_mode
+
+        util.check_input_path(file_path)
+        if check_mode:
+            util.check_input_path(word2index_path)
+            util.check_input_path(index2word_path)
+            util.check(word2index_path, index2word_path)
+        else:
+            util.check_output_path(word2index_path)
+            util.check_output_path(index2word_path)
+            util.check_output_path(histogram_path)
+            save(file_path, word2index_path, index2word_path, histogram_path, min_count)
+
+    except util.FileCanNotBeMadeError, e:
+        print(e)
+    except IOError, e:
+        print(e)

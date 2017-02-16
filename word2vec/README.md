@@ -8,3 +8,9 @@ You can find top-5 nearest embedding vectors using `search.py`.
 
 This example is based on the following word embedding implementation in C++.
 https://code.google.com/p/word2vec/
+
+# Procedures
+
+## generation of word2index and index2word
+
+use `load_data.py` through `run_load_data`.
