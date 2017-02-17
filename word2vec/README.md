@@ -14,3 +14,9 @@ https://code.google.com/p/word2vec/
 ## generation of word2index and index2word
 
 use `load_data.py` through `run_load_data`.
+
+## selection of words
+
+There are many categories each of which has some images(<=1000).
+Names of categories which are used for this project must be included in vocabularies for word2vec.
+Using `find_words.py` through `run_find_word`, categories which meet the condition are decided. 
