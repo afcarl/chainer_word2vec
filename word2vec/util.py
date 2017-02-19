@@ -60,6 +60,15 @@ class FileAlreadyExistsError(IOError):
         return "{} already exists".format(self.path)
 
 
+class InputDirPathError(IOError):
+
+    def __init__(self, path):
+        self.path = path
+
+    def __str__(self):
+        return "{} is not found".format(self.path)
+
+
 def check_input_path(path):
     open(path)
 
@@ -72,6 +81,13 @@ def check_output_path(path):
             raise FileCanNotBeMadeError(path)
     else:
         raise FileAlreadyExistsError(path)
+
+
+def check_input_dir_path(dir_path):
+    if os.path.exists(dir_path) and os.path.isdir(dir_path):
+        pass
+    else:
+        raise InputDirPathError(dir_path)
 
 
 if __name__ == "__main__":
