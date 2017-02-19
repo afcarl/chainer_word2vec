@@ -25,3 +25,7 @@ Using `find_words.py` through `run_find_word`, categories which meet the conditi
 
 Directories with those names which are decided in above procedure are copied.
 Use `copy_selected_image_directory.py` through `run_copy_selected_image_directory`.
+
+## training 
+
+Use `train_word2vec.py` through `run_train`.

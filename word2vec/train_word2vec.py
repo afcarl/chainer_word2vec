@@ -9,16 +9,10 @@ Use ../ptb/download.py to download 'ptb.train.txt'.
 import argparse
 import collections
 
-import numpy as np
-import six
-
 import chainer
 from chainer import cuda
-import chainer.functions as F
-import chainer.initializers as I
 import chainer.links as L
-import chainer.optimizers as O
-from chainer import reporter
+import chainer.optimizer as O
 from chainer import training
 from chainer.training import extensions
 import continuous_bow
@@ -27,10 +21,10 @@ import softmax_cross_entropy_loss
 import customized_window_iterator
 
 import os
-import util 
+import util
 import cPickle
-import index_sequence_maker
-import make_dataset 
+import make_dataset
+
 
 def make_argparser():
     parser = argparse.ArgumentParser()
@@ -42,7 +36,7 @@ def make_argparser():
                         help='window size')
     parser.add_argument('--batchsize', '-b', type=int, default=1000,
                         help='learning minibatch size')
-    parser.add_argument('--epoch', '-e', default=2, type=int, # 20
+    parser.add_argument('--epoch', '-e', default=2, type=int,  # 20
                         help='number of epochs to learn')
     parser.add_argument('--model', '-m', choices=['skipgram', 'cbow'],
                         default='skipgram',
@@ -56,9 +50,12 @@ def make_argparser():
     parser.add_argument('--out', default='result',
                         help='Directory to output the result')
     parser.add_argument('--test', dest='test', action='store_true')
-    parser.add_argument('--input', '-i', type=str, help='input file path')
-    parser.add_argument('--index2word', type=str, help='index2word file path')
-    parser.add_argument('--word2index', type=str, help='word2index file path')
+    parser.add_argument('--input_path', '-i', type=str, help='input file path')
+    parser.add_argument('--index2word_path', type=str, help='index2word file path')
+    parser.add_argument('--word2index_path', type=str, help='word2index file path')
+    parser.add_argument('--counts_path', type=str, help='counts file path')
+    parser.add_argument('--train_max_path', type=str, help='train max file path')
+    parser.add_argument('--total_size_path', type=str, help='total size file path')
     parser.set_defaults(test=False)
     return parser
 
@@ -81,10 +78,10 @@ def load_dataset(input_path, train_size, output_path_0, output_path_1):
     return (train, val)
 
 
-COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"
-TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/train_max.pkl"   
-TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/total_size.pkl"   
-COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"   
+# COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"
+# TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/train_max.pkl"
+# TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/total_size.pkl"
+# COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"
 
 
 def make_dummy_counts(size):
@@ -108,25 +105,29 @@ if __name__ == "__main__":
     print('Training model: {}'.format(args.model))
     print('Output type: {}'.format(args.out_type))
     print('negative size: {}'.format(args.negative_size))
-    print('input: {}'.format(args.input))
-    print('index2word: {}'.format(args.index2word))
-    print('word2index: {}'.format(args.word2index))
+    print('input_path: {}'.format(args.input_path))
+    print('index2word_path: {}'.format(args.index2word_path))
+    print('word2index_path: {}'.format(args.word2index_path))
+    print('word2index_path: {}'.format(args.word2index_path))
+    print('counts_path: {}'.format(args.counts_path))
+    print('train_max_path: {}'.format(args.train_max_path))
+    print('total_size_path: {}'.format(args.total_size_path))
     print('')
 
     if args.gpu >= 0:
         cuda.get_device(args.gpu).use()
-    
-    total_size = util.count_total_size(args.input, TOTAL_SIZE_PATH)
+
+    total_size = util.count_total_size(args.input_path, args.total_size_path)
     print("total_size: {}".format(total_size))
 
     print("...load counts")
-    counts = util.make_counter(args.input, COUNTS_PATH)
-    train_max = util.find_train_max(args.input, TRAIN_MAX_PATH)
+    counts = util.make_counter(args.input_path, args.counts_path)
+    train_max = util.find_train_max(args.input_path, args.train_max_path)
     n_vocab = train_max + 1
 
     print("...load vocab and index2word")
-    vocab = cPickle.load(open(args.word2index)) 
-    index2word = cPickle.load(open(args.index2word))
+    vocab = cPickle.load(open(args.word2index_path))
+    index2word = cPickle.load(open(args.index2word_path))
     print("n_vocab: {}".format(n_vocab))
     print("counts: {}".format(len(counts)))
 
@@ -159,16 +160,16 @@ if __name__ == "__main__":
     optimizer.setup(model)
 
     train_iter = customized_window_iterator.WindowIterator(
-            args.window, 
-            args.batchsize,
-            index_sequence_file_path=args.input,
-            total_size_path=TOTAL_SIZE_PATH,
-            repeat=True)
-            
+        args.window,
+        args.batchsize,
+        index_sequence_file_path=args.input_path,
+        total_size_path=args.total_size_path,
+        repeat=True)
+
     updater = training.StandardUpdater(
-        train_iter, 
-        optimizer, 
-        converter=convert, 
+        train_iter,
+        optimizer,
+        converter=convert,
         device=args.gpu)
     trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
 

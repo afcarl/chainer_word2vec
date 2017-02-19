@@ -2,14 +2,17 @@
 #200000
 ./train_word2vec.py \
     --gpu 0 \
-    --input /home/ubuntu/data/word2vec/original_with_small_vocabulary/jawiki-wakati-index-sequence.txt \
-    --index2word /home/ubuntu/data/word2vec/small/index2word.pkl \
-    --word2index /home/ubuntu/data/word2vec/small/word2index.pkl \
+    --input_path /home/ubuntu/data/word2vec/20160920.wiki \
+    --index2word_path /home/ubuntu/data/word2vec/20160920_index2word.pkl \
+    --word2index_path /home/ubuntu/data/word2vec/20160920_word2index.pkl \
+    --counts_path /home/ubuntu/data/word2vec/20160920_counts.pkl \
+    --train_max_path /home/ubuntu/data/word2vec/20160920_train_max.pkl \
+    --total_size_path /home/ubuntu/data/word2vec/20160920_total_size.pkl \
     --unit 200 \
     --batchsize 160000 \
     --out-type ns \
     --model cbow \
     --window 8 \
-    --out /home/ubuntu/data/word2vec/original_with_small_vocabulary/result \
-    --epoch 5 
+    --out /home/ubuntu/results/word2vec \
+    --epoch 1 
 
