@@ -78,12 +78,6 @@ def load_dataset(input_path, train_size, output_path_0, output_path_1):
     return (train, val)
 
 
-# COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"
-# TRAIN_MAX_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/train_max.pkl"
-# TOTAL_SIZE_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/total_size.pkl"
-# COUNTS_PATH = "/home/ubuntu/data/word2vec/original_with_small_vocabulary/counts.pkl"
-
-
 def make_dummy_counts(size):
     return collections.Counter({i: i for i in range(size)})
 
@@ -128,8 +122,8 @@ if __name__ == "__main__":
     print("...load vocab and index2word")
     vocab = cPickle.load(open(args.word2index_path))
     index2word = cPickle.load(open(args.index2word_path))
-    print("n_vocab: {}".format(n_vocab))
-    print("counts: {}".format(len(counts)))
+    print("n_vocab: {}".format(n_vocab))  # 8651374
+    print("counts: {}".format(len(counts)))  # 8651373
 
     if args.out_type == 'hsm':
         HSM = L.BinaryHierarchicalSoftmax
