@@ -15,6 +15,11 @@ https://code.google.com/p/word2vec/
 
 Use `load_data.py` through `run_load_data`.
 
+## reduce words
+
+We have to make the number of words be less than 661000 to avoid the cuda memory error.
+To do this, use `reduce_words.py` throught `run_reduce_words`.
+
 ## select words which are used for DeViSE
 
 There are many categories each of which has some images(<=1000).

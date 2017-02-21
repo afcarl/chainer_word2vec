@@ -78,7 +78,7 @@ if __name__ == "__main__":
         parser.add_argument("--histogram_path", help="output: set a path a histogram(.pkl)")
         parser.add_argument("--word2index_path", help="output: set a path a word2index file(.pkl)")
         parser.add_argument("--index2word_path", help="output: set a path an index2word file(.pkl)")
-        parser.add_argument("--check_mode", default=False, help="output: set a path an index2word file(.pkl)")
+        parser.add_argument("--check_mode", default=False, help="input: if True, data is checked")
 
         # parse arguments
         args = parser.parse_args()
