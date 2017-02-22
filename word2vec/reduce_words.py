@@ -29,8 +29,17 @@ if __name__ == "__main__":
         util.check_output_path(index2word_path)
 
         histogram = cPickle.load(open(histogram_path))
-        print(len(histogram))
+        print("The total number of words is {}.".format(len(histogram)))
         load_data.reduce_words(histogram, min_count=min_count)
-        print(len(histogram))
+        assert 1 == histogram[load_data.UNKNOWN_WORD], ""
+        print("The number of words is {} after the reduction.".format(len(histogram)))
+        (word2index, index2word) = load_data.make_maps(histogram)
+
+        # save them
+        cPickle.dump(word2index, open(word2index_path, "wb"))
+        print("> save word2index")
+        cPickle.dump(index2word, open(index2word_path, "wb"))
+        print("> save index2word")
+
     except IOError, e:
         print(e)

@@ -1,10 +1,10 @@
 #!/bin/sh
 
-rm /Users/kumada/Data/enwiki/20160920_word2index_min_count_10.pkl
-rm /Users/kumada/Data/enwiki/20160920_index2word_min_count_10.pkl
+rm /Users/kumada/Data/enwiki/20160920_word2index_min_count_32.pkl
+rm /Users/kumada/Data/enwiki/20160920_index2word_min_count_32.pkl
 
 ./reduce_words.py \
         --histogram_path /Users/kumada/Data/enwiki/20160920_histogram.pkl \
         --min_count 32 \
-        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index_min_count_10.pkl \
-        --index2word_path /Users/kumada/Data/enwiki/20160920_index2word_min_count_10.pkl
+        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index_min_count_32.pkl \
+        --index2word_path /Users/kumada/Data/enwiki/20160920_index2word_min_count_32.pkl

@@ -3,11 +3,11 @@
 ./train_word2vec.py \
     --gpu 0 \
     --input_path /home/ubuntu/data/word2vec/20160920_index_sequence.txt \
-    --index2word_path /home/ubuntu/data/word2vec/20160920_index2word.pkl \
-    --word2index_path /home/ubuntu/data/word2vec/20160920_word2index.pkl \
-    --counts_path /home/ubuntu/data/word2vec/20160920_counts.pkl \
-    --train_max_path /home/ubuntu/data/word2vec/20160920_train_max.pkl \
-    --total_size_path /home/ubuntu/data/word2vec/20160920_total_size.pkl \
+    --index2word_path /home/ubuntu/data/word2vec/20160920_index2word_min_count_32.pkl \
+    --word2index_path /home/ubuntu/data/word2vec/20160920_word2index_min_count_32.pkl \
+    --counts_path /home/ubuntu/data/word2vec/20160920_counts_min_count_32.pkl \
+    --train_max_path /home/ubuntu/data/word2vec/20160920_train_max_min_count_32.pkl \
+    --total_size_path /home/ubuntu/data/word2vec/20160920_total_size_min_count_32.pkl \
     --unit 200 \
     --batchsize 160000 \
     --out-type ns \
