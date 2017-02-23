@@ -1,6 +1,6 @@
 #!/bin/sh
 
 ./index_sequence_maker.py \
-        --word2index_file_path /Users/kumada/Data/enwiki/20160920_word2index.pkl \
+        --word2index_file_path /Users/kumada/Data/enwiki/20160920_word2index_min_count_32.pkl \
         --wiki_file_path /Users/kumada/Data/enwiki/20160920.wiki \
-        --index_sequence_file_path /Users/kumada/Data/enwiki/20160920_index_sequence.txt
+        --index_sequence_file_path /Users/kumada/Data/enwiki/20160920_index_sequence_min_count_32.txt

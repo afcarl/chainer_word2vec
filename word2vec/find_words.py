@@ -4,7 +4,6 @@
 import cPickle
 import argparse
 import util
-import os
 
 
 def word_generator(path):
@@ -18,7 +17,7 @@ if __name__ == "__main__":
         # set command-line arguments
         parser = argparse.ArgumentParser()
         parser.add_argument("--file_path", help="input: set a path to a space-separted text file")
-        parser.add_argument("--word2index_path", help="output: set a path a word2index file(.pkl)")
+        parser.add_argument("--word2index_path", help="input: set a path a word2index file(.pkl)")
         parser.add_argument("--output_path", help="output: set an output path")
 
         # parse arguments
@@ -30,19 +29,16 @@ if __name__ == "__main__":
         # check paths
         util.check_input_path(file_path)
         util.check_input_path(word2index_path)
-#        os.remove(output_path)
-#        util.check_output_path(output_path)
+        util.check_output_path(output_path)
 
         print("> now loading word2index...")
         word2index = cPickle.load(open(word2index_path))
         print("> loading done!")
 
-        print(word2index["honey_mesquite"])
-
-#        with open(output_path, "w") as output:
-#            for word, num in word_generator(file_path):
-#                if word in word2index:
-#                    output.write("{} {}\n".format(word, num))
+        with open(output_path, "w") as output:
+            for word, num in word_generator(file_path):
+                if word in word2index:
+                    output.write("{} {}\n".format(word, num))
 
     except IOError, e:
         print(e)

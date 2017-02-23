@@ -2,5 +2,5 @@
 
 ./find_words.py \
         --file_path /Users/kumada/Data/image_net/images/list \
-        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index.pkl \
-        --output_path /Users/kumada/Data/image_net/images/selected_list
+        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index_min_count_32.pkl \
+        --output_path /Users/kumada/Data/image_net/images/selected_list_min_count_32
