@@ -18,7 +18,7 @@ class reduce_words_Test(unittest.TestCase):
 
         w2i = cPickle.load(open(WORD2INDEX_PATH))
         i2w = cPickle.load(open(INDEX2WORD_PATH))
-
+        print(len(w2i))
         i = w2i["<unk>"]
         w = i2w[i]
         self.assertTrue(w == "<unk>")
