@@ -2,7 +2,7 @@
 #200000
 ./train_word2vec.py \
     --gpu 0 \
-    --input_path /home/ubuntu/data/word2vec/20160920_index_sequence.txt \
+    --input_path /home/ubuntu/data/word2vec/20160920_index_sequence_min_count_32.txt \
     --index2word_path /home/ubuntu/data/word2vec/20160920_index2word_min_count_32.pkl \
     --word2index_path /home/ubuntu/data/word2vec/20160920_word2index_min_count_32.pkl \
     --counts_path /home/ubuntu/data/word2vec/20160920_counts_min_count_32.pkl \

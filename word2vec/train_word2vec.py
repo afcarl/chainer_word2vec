@@ -12,7 +12,7 @@ import collections
 import chainer
 from chainer import cuda
 import chainer.links as L
-import chainer.optimizer as O
+import chainer.optimizers as Op
 from chainer import training
 from chainer.training import extensions
 import continuous_bow
@@ -150,7 +150,7 @@ if __name__ == "__main__":
         # When selecting GPU, the error of "out of memory" occurs.
         model.to_gpu()
 
-    optimizer = O.Adam()
+    optimizer = Op.Adam()
     optimizer.setup(model)
 
     train_iter = customized_window_iterator.WindowIterator(
