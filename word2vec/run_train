@@ -14,5 +14,5 @@
     --model cbow \
     --window 8 \
     --out /home/ubuntu/results/word2vec \
-    --epoch 1 
+    --epoch 3 
 
