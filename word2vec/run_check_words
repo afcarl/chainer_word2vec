@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./check_words.py \
+        --label_path /Users/kumada/Data/image_net/label_selected.txt \
+        --word2index_path /Users/kumada/Data/enwiki/20160920_word2index_min_count_32.pkl

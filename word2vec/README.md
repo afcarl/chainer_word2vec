@@ -26,6 +26,9 @@ There are many categories each of which has some images(<=1000).
 Names of categories which are used for the project, DeViSE, must be included in vocabularies for word2vec.
 Using `find_words.py` through `run_find_word`, categories which meet the condition are decided. 
 
+## check out categories for CNN to assure that they are included in the vocabularies for word2vec 
+use `run_check_words`.
+
 ## copy selected directories
 
 Directories with those names which are decided in above procedure are copied.
