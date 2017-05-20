@@ -3,9 +3,9 @@ import numpy
 import six
 
 n_result = 5  # number of search result to show
+MODEL_PATH = '/home/ubuntu/results/word2vec/word2vec.model'
 
-
-with open('word2vec.model', 'r') as f:
+with open(MODEL_PATH, 'r') as f:
     ss = f.readline().split()
     n_vocab, n_units = int(ss[0]), int(ss[1])
     word2index = {}
