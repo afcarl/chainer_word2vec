@@ -42,3 +42,8 @@ Use `index_sequence_maker.py` through `run_index_sequence_maker`.
 ## training 
 
 Use `train_word2vec.py` through `run_train`.
+
+## prediction
+
+Observe the accuracy of a language model by using labels which are trained by CNN.
+Use `run_predict_similarities`.`
