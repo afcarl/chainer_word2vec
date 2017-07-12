@@ -20,9 +20,6 @@ class TestWordSearcher(unittest.TestCase):
             self.assertTrue(similar_word[0] == answer[0])
             self.assertAlmostEqual(similar_word[1], answer[1], delta=1.0e-5)
 
-        similar_words = searcher.search('microsoft')
-        print(similar_words)
-
 
 if __name__ == '__main__':
     unittest.main()

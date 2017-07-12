@@ -31,25 +31,28 @@ class WordSearcher(object):
     # test ok
     def search(self, query):
         similar_words = []
-        if query not in self.word2index:
-            print('"{0}" is not found'.format(query))
-            return similar_words
+        for (i, similarity) in self.similarity_generator(query):
+            similar_words.append((self.index2word[i], similarity))
+        return similar_words
 
-        v = self.w[self.word2index[query]]
+    def similarity_generator(self, query):
+        if query not in self.word2index:
+            raise IOError('"{0}" is not found'.format(query))
+
+        index = self.word2index[query]
+        v = self.w[index]
         similarity = self.w.dot(v)
-        print('query: {}'.format(query))
+        # print('query: {}'.format(query))
         count = 0
         for i in (-similarity).argsort():
             if np.isnan(similarity[i]):
                 continue
-            if self.index2word[i] == query:
+            if i == index:
                 continue
-            # print('{0}: {1}'.format(self.index2word[i], similarity[i]))
-            similar_words.append((self.index2word[i], similarity[i]))
+            yield (i, similarity[i])
             count += 1
             if count == self.n_results:
                 break
-        return similar_words
 
 
 if __name__ == '__main__':
